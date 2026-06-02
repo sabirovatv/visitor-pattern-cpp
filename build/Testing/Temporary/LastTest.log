@@ -1,18 +1,18 @@
-Start testing: May 28 09:50 MSK
+Start testing: Jun 02 09:19 MSK
 ----------------------------------------------------------
 1/1 Testing: VisitorTest
 1/1 Test: VisitorTest
 Command: "/home/toma/visitor-pattern-project/build/tests/test_visitor"
 Directory: /home/toma/visitor-pattern-project/build/tests
-"VisitorTest" start time: May 28 09:50 MSK
+"VisitorTest" start time: Jun 02 09:19 MSK
 Output:
 ----------------------------------------------------------
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
 Test Passed.
-"VisitorTest" end time: May 28 09:50 MSK
+"VisitorTest" end time: Jun 02 09:19 MSK
 "VisitorTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: May 28 09:50 MSK
+End testing: Jun 02 09:19 MSK
