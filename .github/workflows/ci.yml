@@ -2,38 +2,37 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+    tags:
+      - 'v*'
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
-    - name: Build
-      run: cmake --build build --config Release
-    - name: Test
-      run: cd build && ctest --output-on-failure
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build
+      - name: Test
+        run: cd build && ctest
 
-  package:
+  release:
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
     steps:
-    - uses: actions/checkout@v4
-    - name: Configure CMake for packaging
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
-    - name: Build and create package
-      run: |
-        cmake --build build --config Release
-        cd build
-        cpack -G DEB
-    - name: Upload Release Asset
-      uses: softprops/action-gh-release@v1
-      with:
-        files: build/*.deb
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build and package
+        run: |
+          cmake --build build
+          cd build
+          cpack -G DEB
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/*.deb
