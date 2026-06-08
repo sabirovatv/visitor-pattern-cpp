@@ -2,40 +2,55 @@ name: CI
 
 on:
   push:
+    branches: [ main, master ]
     tags:
-      - 'v*'
+      - 'v*' 
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Configure
+
+      - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
       - name: Build
-        run: cmake --build build
-      - name: Test
+        run: cmake --build build --config Release
+
+      - name: Run tests
         run: cd build && ctest --output-on-failure
-      - name: Upload artifact
+
+      - name: Create package (DEB)
+        run: |
+          cd build
+          cpack -G DEB -C Release
+          ls -la *.deb   # проверяем, что файл создался
+
+      - name: Upload .deb as artifact
         uses: actions/upload-artifact@v4
         with:
           name: packages
           path: build/*.deb
+          if-no-files-found: error 
 
   release:
     needs: build-and-test
     runs-on: ubuntu-latest
-    # условие if УБРАНО, так как workflow и так только по тегам
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Download artifact
+
+      - name: Download .deb artifact
         uses: actions/download-artifact@v4
         with:
           name: packages
           path: build
-      - name: Create Release
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: build/*.deb
