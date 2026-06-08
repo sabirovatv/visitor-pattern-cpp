@@ -6,15 +6,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(visitor)
 
-
 enable_testing()
 add_subdirectory(tests)
 
-include(CPack)
+
 set(CPACK_PACKAGE_NAME "visitor-pattern-cpp")
 set(CPACK_PACKAGE_VERSION "1.0.0")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Visitor design pattern example in C++")
 set(CPACK_PACKAGE_VENDOR "sabirovatv")
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "sabirovatamara77@gmail.com")
-set(CPACK_GENERATOR "DEB")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "sabirovatamara77@gmail.com")  # можно использовать этот
+# или более универсальный вариант (достаточно одного):
+set(CPACK_PACKAGE_CONTACT "sabirovatamara77@gmail.com")
+set(CPACK_GENERATOR "DEB" "TGZ")  # добавляем TGZ для простого архива
+
+
 install(TARGETS visitor_demo DESTINATION bin)
+
+
+include(CPack)
