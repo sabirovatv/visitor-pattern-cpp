@@ -2,8 +2,11 @@ name: CI
 
 on:
   push:
+    branches: [ main, master ]
     tags:
       - 'v*'
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   build-and-test:
@@ -15,7 +18,13 @@ jobs:
       - name: Build
         run: cmake --build build
       - name: Test
-        run: cd build && ctest
+        run: cd build && ctest --output-on-failure
+      - name: Upload artifacts (for release)
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: build/*.deb
+          if-no-files-found: warn
 
   release:
     needs: build-and-test
@@ -25,14 +34,15 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Configure
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
-      - name: Build and package
-        run: |
-          cmake --build build
-          cd build
-          cpack -G DEB
-      - name: Release
-        uses: softprops/action-gh-release@v1
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: build
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
         with:
           files: build/*.deb
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
