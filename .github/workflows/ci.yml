@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main, master ]
     tags:
-      - 'v*' 
+      - 'v*'
   pull_request:
     branches: [ main, master ]
 
@@ -27,14 +27,20 @@ jobs:
         run: |
           cd build
           cpack -G DEB -C Release
-          ls -la *.deb   # проверяем, что файл создался
+          echo "Listing .deb files in build:"
+          ls -la *.deb || true
+          # Проверка существования .deb файла
+          if ! ls *.deb 1> /dev/null 2>&1; then
+            echo "Error: .deb package was not created!"
+            exit 1
+          fi
 
       - name: Upload .deb as artifact
         uses: actions/upload-artifact@v4
         with:
           name: packages
           path: build/*.deb
-          if-no-files-found: error 
+          if-no-files-found: error
 
   release:
     needs: build-and-test
@@ -53,6 +59,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_name }} 
           files: build/*.deb
           generate_release_notes: true
         env:
