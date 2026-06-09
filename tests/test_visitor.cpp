@@ -1,8 +1,8 @@
+#include <gtest/gtest.h>
 #include <sstream>
-#include <cassert>
 #include "Visitor.hpp"
 
-int main() {
+TEST(VisitorTest, OutputCheck) {
     std::stringstream buffer;
     auto old_buf = std::cout.rdbuf(buffer.rdbuf());
 
@@ -18,12 +18,16 @@ int main() {
 
     std::cout.rdbuf(old_buf);
 
-    std::string expected = 
+    std::string expected =
         "Concrete Visitor 1: Element A visited.\n"
         "Concrete Visitor 2: Element A visited.\n"
         "Concrete Visitor 1: Element B visited.\n"
         "Concrete Visitor 2: Element B visited.\n";
 
-    assert(buffer.str() == expected);
-    return 0;
+    EXPECT_EQ(buffer.str(), expected);
+}
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
